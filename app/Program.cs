@@ -2,6 +2,7 @@
 using System.IO;
 using System.IO.Compression;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using LibSaberPatch;
 using Newtonsoft.Json;
 using System.Linq;
@@ -91,7 +92,8 @@ namespace app
                                 // It will also add a new collection every iteration - it does ZERO checking for duplicates
                                 Console.WriteLine($"Adding to Collection: {args[i + 1]}:  {level._songName}");
                                 var assetsTxn = new SerializedAssets.Transaction(assets);
-                                AssetPtr levelPtr = level.AddToAssets(assetsTxn, apkTxn, levelID);
+                                var levelData = level.ToAssetData(assetsTxn.scriptIDToScriptPtr, levelID);
+                                AssetPtr levelPtr = level.AddToAssets(assetsTxn, apkTxn, levelID, levelData);
 
                                 // Danger should be over, nothing here should fail
                                 assetsTxn.ApplyTo(assets);
@@ -277,6 +279,7 @@ namespace app
                         i++;
                         continue;
                     }
+                    var serializationFuncs = new List<Func<(JsonLevel, List<List<MonoBehaviorAssetData>>, string, string)>>();
                     Utils.FindLevels(args[i], levelFolder => {
                         try {
                             JsonLevel level = JsonLevel.LoadFromFolder(levelFolder);
@@ -311,19 +314,14 @@ namespace app
                                     Console.WriteLine($"Present: {level._songName}");
                                 }
                             } else {
-                                Console.WriteLine($"Adding:  {level._songName}");
-                                // We use transactions here so if these throw
-                                // an exception, which happens when levels are
-                                // invalid, then it doesn't modify the APK in
-                                // any way that might screw things up later.
-                                var assetsTxn = new SerializedAssets.Transaction(assets);
-                                AssetPtr levelPtr = level.AddToAssets(assetsTxn, apkTxn, levelID);
+                                serializationFuncs.Add(() => {
+                                    var levelData = level.ToAssetData(assets.scriptIDToScriptPtr, levelID);
+                                    existingLevels.Add(levelID);
 
-                                // Danger should be over, nothing here should fail
-                                assetsTxn.ApplyTo(assets);
-                                customCollection.levels.Add(levelPtr);
-                                existingLevels.Add(levelID);
-                                apkTxn.ApplyTo(apk);
+                                    Console.WriteLine($"Serialized:  {level._songName}");
+
+                                    return (level, levelData, levelID, level._songName);
+                                });
                             }
                         } catch (FileNotFoundException e) {
                             Console.WriteLine("[SKIPPING] Missing file referenced by level: {0}", e.FileName);
@@ -331,6 +329,26 @@ namespace app
                             Console.WriteLine("[SKIPPING] Invalid level JSON: {0}", e.Message);
                         }
                     });
+
+                    var serializedAssets = new (JsonLevel, List<List<MonoBehaviorAssetData>>, string, string)[serializationFuncs.Count];
+
+                    Parallel.ForEach(serializationFuncs, (func, state, idx) => {
+                        serializedAssets[idx] = func();
+                    });
+
+                    var assetsBatchTxn = new SerializedAssets.Transaction(assets);
+                    var apkBatchTxn = new Apk.Transaction();
+
+                    foreach (var (level, levelData, levelID, songName) in serializedAssets) {
+                        Console.WriteLine($"Adding:  {songName}");
+
+                        var levelPtr = level.AddToAssets(assetsBatchTxn, apkBatchTxn, levelID, levelData);
+
+                        customCollection.levels.Add(levelPtr);
+                    }
+
+                    assetsBatchTxn.ApplyTo(assets);
+                    apkBatchTxn.ApplyTo(apk);
                 }
                 byte[] outData = assets.ToBytes();
                 apk.ReplaceAssetsFile(Apk.MainAssetsFile, outData);
