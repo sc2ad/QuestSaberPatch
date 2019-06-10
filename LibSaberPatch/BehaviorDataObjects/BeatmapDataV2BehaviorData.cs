@@ -11,17 +11,32 @@ namespace LibSaberPatch.BehaviorDataObjects
         public static byte[] TypeHash = Utils.HexToBytes("87650EB74BF6109EE482D14C881EDC21");
 
         public string jsonData;
+        public byte[] signature;
+        public byte[] projectedData;
 
         public BeatmapDataV2BehaviorData() { }
 
         public BeatmapDataV2BehaviorData(BinaryReader reader, int length)
         {
             jsonData = reader.ReadAlignedString();
+            int nullFields = 2;
+            if (length - reader.BaseStream.Position >= nullFields * 4)
+            {
+                // This means that at least the last bit of data is legible
+                // How do we know if the last or the second-to-last data is null?
+                // For now, let's assume that they both can't be null at the same time.
+                signature = reader.ReadPrefixedBytes();
+                projectedData = reader.ReadPrefixedBytes();
+            }
         }
 
         public override void WriteTo(BinaryWriter w, Apk.Version v)
         {
             w.WriteAlignedString(jsonData);
+            if (signature != null)
+                w.WritePrefixedBytes(signature);
+            if (projectedData != null)
+                w.WritePrefixedBytes(projectedData);
         }
 
         public override int SharedAssetsTypeIndex()
