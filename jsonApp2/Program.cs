@@ -25,6 +25,12 @@ namespace jsonApp
         public SimpleColor colorB;
     }
 
+    class CustomSabers
+    {
+        public string pathToNewLeftSaber;
+        public string pathToNewRightSaber;
+    }
+
     class Invocation {
         public string apkPath;
         public bool patchSignatureCheck;
@@ -212,6 +218,21 @@ namespace jsonApp
                 } catch (JsonReaderException e) {
                     res.installSkipped.Add(levelID, $"Invalid level JSON: {e.Message}");
                 }
+            }
+        }
+
+        static void UpdateSabers(Apk apk, CustomSabers sabers)
+        {
+            SerializedAssets saberAssets = SerializedAssets.FromBytes(apk.ReadEntireEntry(Apk.SabersFile));
+            // There should only be one sabermanager
+            var saberManager = saberAssets.FindScript<SaberManager>(cm => true);
+            var leftGO = saberManager.leftSaber.Follow<GameObjectAssetData>(saberAssets);
+            var leftTransform = leftGO.components[0].Follow<TransformAssetData>(saberAssets);
+            using (var b = new BinaryReader(File.OpenRead(sabers.pathToNewLeftSaber)))
+            {
+                var newLeftPtr = saberAssets.AppendAsset(new GameObjectAssetData(b, 0));
+                leftTransform.children.Add(newLeftPtr);
+                // Also add all of the children of the original LeftSaber GO
             }
         }
 
