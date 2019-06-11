@@ -46,5 +46,8 @@
     // See https://github.com/sc2ad/QuestModdingTools/blob/master/BeatSaberLocale.txt for
     // what keys are available and what text they start with
     "BUTTON_PLAY": "GO!",
-  }
+  },
+  "soundEffectsFiles": [
+    "testsound.ogg"
+  ]
 }

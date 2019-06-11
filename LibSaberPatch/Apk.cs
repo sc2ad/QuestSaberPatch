@@ -90,6 +90,16 @@ namespace LibSaberPatch
             return "assets/bin/Data/231368cb9c1d5dd43988f2a85226e7d7";
         }
 
+        public string SoundEffectsFile()
+        {
+            return "assets/bin/Data/level13";
+        }
+
+        public string SoundEffectsAudioClipsFile()
+        {
+            return "assets/bin/Data/sharedassets13.assets";
+        }
+
         public byte[] ReadEntireEntry(string entryPath) {
             ZipEntry entry = archive[entryPath];
             if(entry == null) return JoinedContents(entryPath);

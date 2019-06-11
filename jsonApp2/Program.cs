@@ -35,6 +35,7 @@ namespace jsonApp
 
         public CustomColors colors;
         public Dictionary<string, string> replaceText;
+        public List<string> soundEffectsFiles;
     }
     #pragma warning restore 0649
 
@@ -94,6 +95,11 @@ namespace jsonApp
 
                     if(inv.replaceText != null) {
                         UpdateText(apk, inv.replaceText);
+                    }
+
+                    if(inv.soundEffectsFiles != null)
+                    {
+                        UpdateSoundEffects(apk, inv.soundEffectsFiles);
                     }
                 }
 
@@ -247,6 +253,19 @@ namespace jsonApp
 
             ta.WriteLocaleText(segments);
             apk.ReplaceAssetsFile(apk.TextFile(), textAssets.ToBytes());
+        }
+
+        static void UpdateSoundEffects(Apk apk, List<string> audioClips)
+        {
+            SerializedAssets assetsForEffect = SerializedAssets.FromBytes(apk.ReadEntireEntry(apk.SoundEffectsFile()), apk.version);
+            SerializedAssets assetsForAudio = SerializedAssets.FromBytes(apk.ReadEntireEntry(apk.SoundEffectsAudioClipsFile()), apk.version);
+
+            var trans = new Apk.Transaction();
+            NoteCutSoundEffectManagerBehaviorData.CreateSoundEffectsFromFiles(trans, assetsForEffect, assetsForAudio, audioClips);
+
+            trans.ApplyTo(apk);
+            apk.WriteEntireEntry(apk.SoundEffectsFile(), assetsForEffect.ToBytes());
+            apk.WriteEntireEntry(apk.SoundEffectsAudioClipsFile(), assetsForAudio.ToBytes());
         }
     }
 }

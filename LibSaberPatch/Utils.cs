@@ -83,6 +83,34 @@ namespace LibSaberPatch
 
             assets.RemoveAssetAt(obj.pathID);
         }
+
+        public static AudioClipAssetData CreateAudioAsset(Apk.Transaction apk, string levelID, string audioClipFile)
+        {
+            string sourceFileName = levelID + ".ogg";
+            apk.CopyFileInto(audioClipFile, $"assets/bin/Data/{sourceFileName}");
+            ulong fileSize = (ulong)new FileInfo(audioClipFile).Length;
+            using (NVorbis.VorbisReader v = new NVorbis.VorbisReader(audioClipFile))
+            {
+                return new AudioClipAssetData()
+                {
+                    name = levelID,
+                    loadType = 1,
+                    channels = v.Channels,
+                    frequency = v.SampleRate,
+                    bitsPerSample = 16,
+                    length = (Single)v.TotalTime.TotalSeconds,
+                    isTracker = false,
+                    subsoundIndex = 0,
+                    preloadAudio = false,
+                    backgroundLoad = true,
+                    legacy3D = true,
+                    compressionFormat = 1, // vorbis
+                    source = sourceFileName,
+                    offset = 0,
+                    size = fileSize,
+                };
+            }
+        }
     }
 
     // loosely based on https://stackoverflow.com/questions/1440392/use-byte-as-key-in-dictionary

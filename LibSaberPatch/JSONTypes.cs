@@ -36,7 +36,15 @@ namespace LibSaberPatch
             Characteristic characteristic
         ) {
             string beatmapFile = Path.Combine(levelFolderPath, _beatmapFilename);
-            var beatmapData = BeatmapDataBehaviorData.FromJsonFile(beatmapFile, assets.apkVersion);
+            string jsonData = File.ReadAllText(beatmapFile);
+            BeatmapSaveData saveData = JsonConvert.DeserializeObject<BeatmapSaveData>(jsonData);
+            byte[] projectedData = saveData.SerializeToBinary();
+
+            BeatmapDataBehaviorData beatmapData = new BeatmapDataBehaviorData() {
+                jsonData = "",
+                signature = new byte[128], // all zeros
+                projectedData = projectedData,
+            };
             string characteristicPart = ((characteristic == Characteristic.Standard) ? "" : characteristic.ToString());
             string assetName = levelID + characteristicPart + _difficulty.ToString() + "BeatmapData";
             MonoBehaviorAssetData monob = new MonoBehaviorAssetData() {
@@ -176,29 +184,7 @@ namespace LibSaberPatch
         }
 
         private AudioClipAssetData CreateAudioAsset(Apk.Transaction apk, string levelID) {
-            string audioClipFile = Path.Combine(levelFolderPath, _songFilename);
-            string sourceFileName = levelID+".ogg";
-            apk.CopyFileInto(audioClipFile, $"assets/bin/Data/{sourceFileName}");
-            ulong fileSize = (ulong)new FileInfo(audioClipFile).Length;
-            using (NVorbis.VorbisReader v = new NVorbis.VorbisReader(audioClipFile)) {
-                return new AudioClipAssetData() {
-                    name = levelID,
-                    loadType = 1,
-                    channels = v.Channels,
-                    frequency = v.SampleRate,
-                    bitsPerSample = 16,
-                    length = (Single)v.TotalTime.TotalSeconds,
-                    isTracker = false,
-                    subsoundIndex = 0,
-                    preloadAudio = false,
-                    backgroundLoad = true,
-                    legacy3D = true,
-                    compressionFormat = 1, // vorbis
-                    source = sourceFileName,
-                    offset = 0,
-                    size = fileSize,
-                };
-            }
+            return Utils.CreateAudioAsset(apk, levelID, Path.Combine(levelFolderPath, _songFilename));
         }
     }
 }

@@ -77,6 +77,12 @@ namespace LibSaberPatch.AssetDataObjects
                 data = new AlwaysOwnedBehaviorData(reader, length - headerLen);
                 return;
             }
+            if (typeRef.scriptID.SequenceEqual(NoteCutSoundEffectManagerBehaviorData.ScriptID))
+            {
+                data = new NoteCutSoundEffectManagerBehaviorData(reader, length - headerLen, version);
+                return;
+            }
+
 
             switch (script.pathID)
             {
