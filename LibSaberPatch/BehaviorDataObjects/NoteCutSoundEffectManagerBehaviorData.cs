@@ -10,6 +10,17 @@ namespace LibSaberPatch.BehaviorDataObjects
     {
         // 144, 297 (get hash of this)
         public static readonly byte[] ScriptID = Utils.HexToBytes("BD30549906EE2F82984D617A365590FB");
+        // TODO Make these use script hashes instead of being raw pointers- harder to update as is now.
+        private static readonly List<AssetPtr> defaultLongCutEffects = new List<AssetPtr>()
+        {
+            new AssetPtr(3,71), new AssetPtr(3,69), new AssetPtr(3,64), new AssetPtr(3,78), new AssetPtr(3,73),
+            new AssetPtr(3,61), new AssetPtr(3,77), new AssetPtr(3,68), new AssetPtr(3,72), new AssetPtr(3,67)
+        };
+        private static readonly List<AssetPtr> defaultShortCutEffects = new List<AssetPtr>()
+        {
+            new AssetPtr(3,66), new AssetPtr(3,81), new AssetPtr(3,82), new AssetPtr(3,60), new AssetPtr(3,74),
+            new AssetPtr(3,63), new AssetPtr(3,79), new AssetPtr(3,70), new AssetPtr(3,83), new AssetPtr(3,76)
+        };
 
         // DEFAULTS:
         // Long: (3=123)
@@ -83,6 +94,12 @@ namespace LibSaberPatch.BehaviorDataObjects
             }
             old.longCutEffectsAudioClips.Clear();
             old.shortCutEffectsAudioClips.Clear();
+            if (audioFiles.Count == 0)
+            {
+                old.longCutEffectsAudioClips.AddRange(defaultLongCutEffects);
+                old.shortCutEffectsAudioClips.AddRange(defaultShortCutEffects);
+                return;
+            }
             // For now, just add each file to both short and long (I don't think there is a time constraint on them)
             foreach (string s in audioFiles)
             {
