@@ -80,18 +80,6 @@ namespace LibSaberPatch.AssetDataObjects
 
             switch (script.pathID)
             {
-                case TextMeshPro.PathID:
-                    data = new TextMeshPro(reader, length - headerLen);
-                    break;
-                case Saber.PathID:
-                    data = new Saber(reader, length - headerLen);
-                    break;
-                case LocalizedTextMeshProUGUI.PathID:
-                    data = new LocalizedTextMeshProUGUI(reader, length - headerLen);
-                    break;
-                case Localization.PathID:
-                    data = new Localization(reader, length - headerLen);
-                    break;
                 default:
                     data = new UnknownBehaviorData(reader, length - headerLen);
                     break;

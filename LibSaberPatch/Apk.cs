@@ -17,6 +17,7 @@ namespace LibSaberPatch
             internal const string MainAssetsFile1 = "assets/bin/Data/sharedassets17.assets";
             internal const string MainAssetsFile2 = "assets/bin/Data/sharedassets18.assets";
             internal const string RootPackFile1 = "assets/bin/Data/sharedassets19.assets";
+            internal const string RootPackFile2 = "assets/bin/Data/sharedassets20.assets";
             internal const string ColorsFile1 = "assets/bin/Data/sharedassets1.assets";
             internal const string TextFile1 = "assets/bin/Data/231368cb9c1d5dd43988f2a85226e7d7";
         }
@@ -76,6 +77,10 @@ namespace LibSaberPatch
 
         public string RootPackFile()
         {
+            if (version >= Version.V1_1_0)
+            {
+                return FileConstants.RootPackFile2;
+            }
             return FileConstants.RootPackFile1;
         }
 

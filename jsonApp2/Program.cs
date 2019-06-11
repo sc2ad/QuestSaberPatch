@@ -122,7 +122,7 @@ namespace jsonApp
 
             // === Load root level pack
             SerializedAssets rootPackAssets = SerializedAssets.FromBytes(apk.ReadEntireEntry(apk.RootPackFile()), apk.version);
-            int mainFileI = rootPackAssets.externals.FindIndex(e => e.pathName == "sharedassets17.assets") + 1;
+            int mainFileI = rootPackAssets.externals.FindIndex(e => e.pathName == apk.MainAssetsFile()) + 1;
             BeatmapLevelPackCollection rootLevelPack = rootPackAssets.FindMainLevelPackCollection();
 
             // === Remove existing custom packs
@@ -229,18 +229,18 @@ namespace jsonApp
             SerializedAssets textAssets = SerializedAssets.FromBytes(apk.ReadEntireEntry(apk.TextFile()), apk.version);
             var aotext = textAssets.GetAssetAt(1);
             TextAssetData ta = aotext.data as TextAssetData;
-            var segments = ta.ReadLocaleText(new List<char>() { ',', ',', '\n' });
+            var segments = ta.ReadLocaleText();
             TextAssetData.ApplyWatermark(segments);
 
             foreach(var entry in replaceText) {
-                List<string> value;
+                Dictionary<string, string> value;
                 if (!segments.TryGetValue(entry.Key, out value)) {
                     continue;
                 }
-                segments[entry.Key][value.Count - 1] = entry.Value;
+                value["ENGLISH"] = entry.Value;
             }
 
-            ta.WriteLocaleText(segments, new List<char>() { ',', ',', '\n' });
+            ta.WriteLocaleText(segments);
             apk.ReplaceAssetsFile(apk.TextFile(), textAssets.ToBytes());
         }
     }
