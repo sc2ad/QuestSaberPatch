@@ -80,7 +80,7 @@ namespace LibSaberPatch.AssetDataObjects
         {
             // FOR NOW, ONLY APPLIES THE WATERMARK IN ENGLISH
             string header = "\n<size=150%><color=#EC1C24FF>Quest Modders</color></size>";
-            string testersHeader = "<color=#E543E5FF>Testers</color>";
+            string testersHeader = "<size=120%><color=#E543E5FF>Testers</color></size>";
 
             string sc2ad = "<color=#EDCE21FF>Sc2ad</color>";
             string trishume = "<color=#40E0D0FF>trishume</color>";
@@ -100,20 +100,18 @@ namespace LibSaberPatch.AssetDataObjects
             localeValues["CREDITS_CONTENT"]["ENGLISH"] = item.Remove(item.Length - 2) + message + '"';
         }
 
-        public string WriteLocaleText(Dictionary<string, Dictionary<string, string>> values)
+        public void WriteLocaleText(Dictionary<string, Dictionary<string, string>> values)
         {
-            string temp = "";
-            foreach (string s in values.Keys)
-            {
-                temp += s;
-                foreach (string lang in values[s].Keys)
-                {
-                    temp += ',' + lang + ',' + values[s][lang];
+            StringBuilder sb = new StringBuilder();
+            foreach (string s in values.Keys) {
+                foreach (string lang in values[s].Keys) {
+                    sb.AppendFormat("{0},", values[s][lang]);
                 }
-                temp += '\n';
+                sb.Length--; // remove trailing comma
+                sb.Append("\r\n");
             }
-            temp = temp.Remove(temp.Length - 1);
-            return temp;
+            sb.Length = sb.Length - 1; // remove trailing newline
+            script = sb.ToString();
         }
     }
 }
