@@ -32,6 +32,11 @@ namespace LibSaberPatch.BehaviorDataObjects
             w.Write(a);
         }
 
+        public override string ToString()
+        {
+            return $"({r}, {g}, {b}, {a})";
+        }
+
         // default is red and on the left
         public static SimpleColor DefaultColorA() {
             return new SimpleColor() {

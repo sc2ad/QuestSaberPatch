@@ -47,7 +47,10 @@ namespace jsonApp
         public List<string> installedLevels;
         public List<string> removedLevels;
         public List<string> missingFromPacks;
-        public Dictionary<string,string> installSkipped;
+        public Dictionary<string, string> installSkipped;
+        public (string, string) colorsChanged;
+        public Dictionary<string, string> textReplaced;
+        public List<string> replacedNoteCutSounds;
         public string error;
 
         public InvocationResult() {
@@ -56,6 +59,8 @@ namespace jsonApp
             installSkipped = new Dictionary<string, string>();
             installedLevels = new List<string>();
             missingFromPacks = new List<string>();
+            textReplaced = new Dictionary<string, string>();
+            replacedNoteCutSounds = new List<string>();
         }
     }
 
@@ -90,16 +95,16 @@ namespace jsonApp
                     apk.ReplaceAssetsFile(apk.MainAssetsFile(), mainAssets.ToBytes());
 
                     if(inv.colors != null) {
-                        UpdateColors(apk, inv.colors);
+                        UpdateColors(apk, inv.colors, res);
                     }
 
                     if(inv.replaceText != null) {
-                        UpdateText(apk, inv.replaceText);
+                        UpdateText(apk, inv.replaceText, res);
                     }
 
                     if(inv.soundEffectsFiles != null)
                     {
-                        UpdateSoundEffects(apk, inv.soundEffectsFiles);
+                        UpdateSoundEffects(apk, inv.soundEffectsFiles, res);
                     }
                 }
 
@@ -226,7 +231,7 @@ namespace jsonApp
             }
         }
 
-        static void UpdateColors(Apk apk, CustomColors colors) {
+        static void UpdateColors(Apk apk, CustomColors colors, InvocationResult res) {
             SerializedAssets colorAssets = SerializedAssets.FromBytes(
                 apk.ReadEntireEntry(apk.ColorsFile()), apk.version);
             // There should only be one color manager
@@ -234,14 +239,17 @@ namespace jsonApp
             colorManager.UpdateColor(colorAssets, colors.colorA, ColorManager.ColorSide.A);
             colorManager.UpdateColor(colorAssets, colors.colorB, ColorManager.ColorSide.B);
             apk.ReplaceAssetsFile(apk.ColorsFile(), colorAssets.ToBytes());
+            res.colorsChanged = (colors.colorA?.ToString(), colors.colorB?.ToString());
         }
 
-        static void UpdateText(Apk apk, Dictionary<string, string> replaceText) {
+        static void UpdateText(Apk apk, Dictionary<string, string> replaceText, InvocationResult res) {
             SerializedAssets textAssets = SerializedAssets.FromBytes(apk.ReadEntireEntry(apk.TextFile()), apk.version);
             var aotext = textAssets.GetAssetAt(1);
             TextAssetData ta = aotext.data as TextAssetData;
             var segments = ta.ReadLocaleText();
             TextAssetData.ApplyWatermark(segments);
+
+            var result = new Dictionary<string, string>();
 
             foreach(var entry in replaceText) {
                 Dictionary<string, string> value;
@@ -249,13 +257,15 @@ namespace jsonApp
                     continue;
                 }
                 value["ENGLISH"] = entry.Value;
+                result.Add(entry.Key, entry.Value);
             }
 
             ta.WriteLocaleText(segments);
             apk.ReplaceAssetsFile(apk.TextFile(), textAssets.ToBytes());
+            res.textReplaced = result;
         }
 
-        static void UpdateSoundEffects(Apk apk, List<string> audioClips)
+        static void UpdateSoundEffects(Apk apk, List<string> audioClips, InvocationResult res)
         {
             SerializedAssets assetsForEffect = SerializedAssets.FromBytes(apk.ReadEntireEntry(apk.SoundEffectsFile()), apk.version);
             SerializedAssets assetsForAudio = SerializedAssets.FromBytes(apk.ReadEntireEntry(apk.SoundEffectsAudioClipsFile()), apk.version);
@@ -266,6 +276,7 @@ namespace jsonApp
             trans.ApplyTo(apk);
             apk.WriteEntireEntry(apk.SoundEffectsFile(), assetsForEffect.ToBytes());
             apk.WriteEntireEntry(apk.SoundEffectsAudioClipsFile(), assetsForAudio.ToBytes());
+            res.replacedNoteCutSounds.AddRange(audioClips);
         }
     }
 }
