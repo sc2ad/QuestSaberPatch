@@ -36,6 +36,7 @@ namespace jsonApp
         public CustomColors colors;
         public Dictionary<string, string> replaceText;
         public List<string> soundEffectsFiles;
+        public (int, float) feverData;
     }
     #pragma warning restore 0649
 
@@ -102,13 +103,19 @@ namespace jsonApp
                         UpdateText(apk, inv.replaceText, res);
                     }
 
-                    if(inv.soundEffectsFiles != null)
+                    SerializedAssets assets = SerializedAssets.FromBytes(apk.ReadEntireEntry(apk.SoundEffectsFile()), apk.version);
+
+                    if (inv.soundEffectsFiles != null)
                     {
-                        UpdateSoundEffects(apk, inv.soundEffectsFiles, res);
+                        UpdateSoundEffects(apk, assets, inv.soundEffectsFiles, res);
                     }
+
+                    UpdateFever(apk, assets, inv.feverData, res);
+
+                    apk.WriteEntireEntry(apk.SoundEffectsFile(), assets.ToBytes());
                 }
 
-                if(inv.sign) {
+                if (inv.sign) {
                     Signer.Sign(inv.apkPath);
                     res.didSign = true;
                 }
@@ -265,18 +272,23 @@ namespace jsonApp
             res.textReplaced = result;
         }
 
-        static void UpdateSoundEffects(Apk apk, List<string> audioClips, InvocationResult res)
+        static void UpdateSoundEffects(Apk apk, SerializedAssets assetsForEffect, List<string> audioClips, InvocationResult res)
         {
-            SerializedAssets assetsForEffect = SerializedAssets.FromBytes(apk.ReadEntireEntry(apk.SoundEffectsFile()), apk.version);
             SerializedAssets assetsForAudio = SerializedAssets.FromBytes(apk.ReadEntireEntry(apk.SoundEffectsAudioClipsFile()), apk.version);
 
             var trans = new Apk.Transaction();
             NoteCutSoundEffectManagerBehaviorData.CreateSoundEffectsFromFiles(trans, assetsForEffect, assetsForAudio, audioClips);
 
             trans.ApplyTo(apk);
-            apk.WriteEntireEntry(apk.SoundEffectsFile(), assetsForEffect.ToBytes());
             apk.WriteEntireEntry(apk.SoundEffectsAudioClipsFile(), assetsForAudio.ToBytes());
             res.replacedNoteCutSounds.AddRange(audioClips);
+        }
+
+        static void UpdateFever(Apk apk, SerializedAssets assetsForFever, (int, float) data, InvocationResult res)
+        {
+            var sm = assetsForFever.FindScript<ScoreManager>(m => true); // Only one ScoreManager
+            sm.feverModeRequiredCombo = data.Item1;
+            sm.feverModeDuration = data.Item2;
         }
     }
 }

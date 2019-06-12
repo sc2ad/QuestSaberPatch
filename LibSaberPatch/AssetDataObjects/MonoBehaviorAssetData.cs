@@ -82,7 +82,11 @@ namespace LibSaberPatch.AssetDataObjects
                 data = new NoteCutSoundEffectManagerBehaviorData(reader, length - headerLen, version);
                 return;
             }
-
+            if (typeRef.scriptID.SequenceEqual(ScoreManager.ScriptID))
+            {
+                data = new ScoreManager(reader, length - headerLen, version);
+                return;
+            }
 
             switch (script.pathID)
             {
