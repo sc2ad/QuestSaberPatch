@@ -48,15 +48,17 @@ namespace jsonApp
         public List<string> installedLevels;
         public List<string> removedLevels;
         public List<string> missingFromPacks;
-        public Dictionary<string, string> installSkipped;
-        public (string, string) colorsChanged;
-        public Dictionary<string, string> textReplaced;
-        public List<string> replacedNoteCutSounds;
+        public Dictionary<string,string> installSkipped;
+
+        public CustomColors newColors;
+        public bool didReplaceText;
+
         public string error;
 
         public InvocationResult() {
             didSignatureCheckPatch = false;
             didSign = false;
+            didReplaceText = false;
             installSkipped = new Dictionary<string, string>();
             installedLevels = new List<string>();
             missingFromPacks = new List<string>();
@@ -113,6 +115,8 @@ namespace jsonApp
                     UpdateFever(apk, assets, inv.feverData, res);
 
                     apk.WriteEntireEntry(apk.SoundEffectsFile(), assets.ToBytes());
+
+                    apk.Save();
                 }
 
                 if (inv.sign) {
@@ -246,7 +250,10 @@ namespace jsonApp
             colorManager.UpdateColor(colorAssets, colors.colorA, ColorManager.ColorSide.A);
             colorManager.UpdateColor(colorAssets, colors.colorB, ColorManager.ColorSide.B);
             apk.ReplaceAssetsFile(apk.ColorsFile(), colorAssets.ToBytes());
-            res.colorsChanged = (colors.colorA?.ToString(), colors.colorB?.ToString());
+            res.newColors = new CustomColors() {
+                colorA = colorManager.colorA.FollowToScript<SimpleColor>(colorAssets),
+                colorB = colorManager.colorB.FollowToScript<SimpleColor>(colorAssets),
+            };
         }
 
         static void UpdateText(Apk apk, Dictionary<string, string> replaceText, InvocationResult res) {
@@ -269,7 +276,7 @@ namespace jsonApp
 
             ta.WriteLocaleText(segments);
             apk.ReplaceAssetsFile(apk.TextFile(), textAssets.ToBytes());
-            res.textReplaced = result;
+            res.didReplaceText = true;
         }
 
         static void UpdateSoundEffects(Apk apk, SerializedAssets assetsForEffect, List<string> audioClips, InvocationResult res)
