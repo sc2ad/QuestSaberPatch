@@ -36,7 +36,6 @@ namespace jsonApp
         public CustomColors colors;
         public Dictionary<string, string> replaceText;
         public List<string> soundEffectsFiles;
-        public (int, float) feverData;
     }
     #pragma warning restore 0649
 
@@ -53,6 +52,8 @@ namespace jsonApp
         public CustomColors newColors;
         public bool didReplaceText;
 
+        public List<string> replacedNoteCutSounds;
+
         public string error;
 
         public InvocationResult() {
@@ -62,7 +63,6 @@ namespace jsonApp
             installSkipped = new Dictionary<string, string>();
             installedLevels = new List<string>();
             missingFromPacks = new List<string>();
-            textReplaced = new Dictionary<string, string>();
             replacedNoteCutSounds = new List<string>();
         }
     }
@@ -105,16 +105,12 @@ namespace jsonApp
                         UpdateText(apk, inv.replaceText, res);
                     }
 
-                    SerializedAssets assets = SerializedAssets.FromBytes(apk.ReadEntireEntry(apk.SoundEffectsFile()), apk.version);
-
                     if (inv.soundEffectsFiles != null)
                     {
+                        SerializedAssets assets = SerializedAssets.FromBytes(apk.ReadEntireEntry(apk.SoundEffectsFile()), apk.version);
                         UpdateSoundEffects(apk, assets, inv.soundEffectsFiles, res);
+                        apk.WriteEntireEntry(apk.SoundEffectsFile(), assets.ToBytes());
                     }
-
-                    UpdateFever(apk, assets, inv.feverData, res);
-
-                    apk.WriteEntireEntry(apk.SoundEffectsFile(), assets.ToBytes());
 
                     apk.Save();
                 }
@@ -289,13 +285,6 @@ namespace jsonApp
             trans.ApplyTo(apk);
             apk.WriteEntireEntry(apk.SoundEffectsAudioClipsFile(), assetsForAudio.ToBytes());
             res.replacedNoteCutSounds.AddRange(audioClips);
-        }
-
-        static void UpdateFever(Apk apk, SerializedAssets assetsForFever, (int, float) data, InvocationResult res)
-        {
-            var sm = assetsForFever.FindScript<ScoreManager>(m => true); // Only one ScoreManager
-            sm.feverModeRequiredCombo = data.Item1;
-            sm.feverModeDuration = data.Item2;
         }
     }
 }
