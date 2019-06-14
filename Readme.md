@@ -1,5 +1,7 @@
 # QuestSaberPatch
 
+[![Build Status](https://travis-ci.org/sc2ad/QuestSaberPatch.svg?branch=master)](https://travis-ci.org/sc2ad/QuestSaberPatch)
+
 A custom song patcher for Beat Saber on the Oculus Quest, written in C# and runnable cross-platform on macOS, Windows and Linux. It can successfully add custom songs to the Quest as well as create custom packs and saber colors with the advanced JSON interface. Based on discoveries both of my own as well as many discoveries made by [@emulamer](https://github.com/emulamer/QuestStopgap) (his code was also an excellent reference!), with lots of code contributed by [@sc2ad](https://github.com/sc2ad), and information from others on the Beat Saber modding Discord.
 
 ## Features
