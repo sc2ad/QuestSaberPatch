@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.IO;
 using System.IO.Compression;
@@ -34,6 +34,7 @@ namespace jsonApp
         public List<LevelPack> packs;
 
         public CustomColors colors;
+        public string replacementLanguage;
         public Dictionary<string, string> replaceText;
         public List<string> soundEffectsFiles;
     }
@@ -102,7 +103,7 @@ namespace jsonApp
                     }
 
                     if(inv.replaceText != null) {
-                        UpdateText(apk, inv.replaceText, res);
+                        UpdateText(apk, inv.replaceText, inv.replacementLanguage, res);
                     }
 
                     if (inv.soundEffectsFiles != null)
@@ -252,7 +253,7 @@ namespace jsonApp
             };
         }
 
-        static void UpdateText(Apk apk, Dictionary<string, string> replaceText, InvocationResult res) {
+        static void UpdateText(Apk apk, Dictionary<string, string> replaceText, string replacementLanguage, InvocationResult res) {
             SerializedAssets textAssets = SerializedAssets.FromBytes(apk.ReadEntireEntry(apk.TextFile()), apk.version);
             var aotext = textAssets.GetAssetAt(1);
             TextAssetData ta = aotext.data as TextAssetData;
@@ -266,7 +267,7 @@ namespace jsonApp
                 if (!segments.TryGetValue(entry.Key, out value)) {
                     continue;
                 }
-                value["ENGLISH"] = entry.Value;
+                value[replacementLanguage] = entry.Value;
                 result.Add(entry.Key, entry.Value);
             }
 

@@ -42,8 +42,11 @@
   },
   // if null or missing, doesn't replace text, if non-null but even if an
   // empty dictionary, adds usernames of all the Quest Modders to the credits
+  // replacement language must be one of the following languages, as listed here: https://github.com/sc2ad/QuestModdingTools/blob/master/SupportedLanguages.txt
+  // It must be entered EXACTLY as it is on each line, INCLUDING the /!
+  "replacementLanguage": "ENGLISH",
   "replaceText": {
-    // See https://github.com/sc2ad/QuestModdingTools/blob/master/BeatSaberLocale.txt for
+    // See https://github.com/sc2ad/QuestModdingTools/blob/master/BeatSaberLocale_1_1_0.txt for
     // what keys are available and what text they start with
     "BUTTON_PLAY": "GO!",
   },
