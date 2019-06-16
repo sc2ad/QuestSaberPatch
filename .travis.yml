@@ -16,7 +16,7 @@ script:
 after_success:
   - cp ./jsonApp/bin/Release/netcoreapp2.2/${TRAVIS_OS_NAME}-x64/publish/jsonApp* ./app/bin/Release/netcoreapp2.2/${TRAVIS_OS_NAME}-x64/publish/
   - cp ./jsonApp2/bin/Release/netcoreapp2.2/${TRAVIS_OS_NAME}-x64/publish/jsonApp2* ./app/bin/Release/netcoreapp2.2/${TRAVIS_OS_NAME}-x64/publish/
-  - cp ./testdata/dist/gui_script* ./app/bin/Release/netcoreapp2.2/${TRAVIS_OS_NAME}-x64/publish/
+  - cp ./dist/gui_script* ./app/bin/Release/netcoreapp2.2/${TRAVIS_OS_NAME}-x64/publish/
   - cd app/bin/Release/netcoreapp2.2/${TRAVIS_OS_NAME}-x64
   - mv publish questsaberpatch
   - ls -lAhR questsaberpatch
