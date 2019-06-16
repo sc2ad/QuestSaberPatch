@@ -43,8 +43,15 @@
   // if null or missing, doesn't replace text, if non-null but even if an
   // empty dictionary, adds usernames of all the Quest Modders to the credits
   // replacement language must be one of the following languages, as listed here: https://github.com/sc2ad/QuestModdingTools/blob/master/SupportedLanguages.txt
-  // It must be entered EXACTLY as it is on each line, INCLUDING the /!
+  // When replacing a language that contains a "/", DO NOT! copy over the / as well! ONLY COPY OVER THE ENGLSH PART!
   "replacementLanguage": "ENGLISH",
+  // Enter the language to swap to. The language to swap to must be a key from the link above.
+  // Setting swap to false will make sure that the language does not get swapped.
+  // DO NOT COPY OVER THE SLASH FROM THE SupportedLanguages.txt file! ONLY copy over the english!
+  "swapLanguage": {
+    "swap": true,
+    "languageToSwapTo": "TRADITIONAL CHINESE"
+  },
   "replaceText": {
     // See https://github.com/sc2ad/QuestModdingTools/blob/master/BeatSaberLocale_1_1_0.txt for
     // what keys are available and what text they start with

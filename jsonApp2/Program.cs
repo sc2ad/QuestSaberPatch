@@ -25,6 +25,12 @@ namespace jsonApp
         public SimpleColor colorB;
     }
 
+    class SwapLanguage
+    {
+        public bool swap;
+        public string languageToSwapTo;
+    }
+
     class Invocation {
         public string apkPath;
         public bool patchSignatureCheck;
@@ -34,6 +40,7 @@ namespace jsonApp
         public List<LevelPack> packs;
 
         public CustomColors colors;
+        public SwapLanguage swapLanguage;
         public string replacementLanguage;
         public Dictionary<string, string> replaceText;
         public List<string> soundEffectsFiles;
@@ -52,6 +59,7 @@ namespace jsonApp
 
         public CustomColors newColors;
         public bool didReplaceText;
+        public bool swappedLanguage;
 
         public List<string> replacedNoteCutSounds;
 
@@ -61,6 +69,7 @@ namespace jsonApp
             didSignatureCheckPatch = false;
             didSign = false;
             didReplaceText = false;
+            swappedLanguage = false;
             installSkipped = new Dictionary<string, string>();
             installedLevels = new List<string>();
             missingFromPacks = new List<string>();
@@ -103,7 +112,7 @@ namespace jsonApp
                     }
 
                     if(inv.replaceText != null) {
-                        UpdateText(apk, inv.replaceText, inv.replacementLanguage, res);
+                        UpdateText(apk, inv.replaceText, inv.replacementLanguage, inv.swapLanguage, res);
                     }
 
                     if (inv.soundEffectsFiles != null)
@@ -253,7 +262,7 @@ namespace jsonApp
             };
         }
 
-        static void UpdateText(Apk apk, Dictionary<string, string> replaceText, string replacementLanguage, InvocationResult res) {
+        static void UpdateText(Apk apk, Dictionary<string, string> replaceText, string replacementLanguage, SwapLanguage swap, InvocationResult res) {
             SerializedAssets textAssets = SerializedAssets.FromBytes(apk.ReadEntireEntry(apk.TextFile()), apk.version);
             var aotext = textAssets.GetAssetAt(1);
             TextAssetData ta = aotext.data as TextAssetData;
@@ -267,8 +276,19 @@ namespace jsonApp
                 if (!segments.TryGetValue(entry.Key, out value)) {
                     continue;
                 }
-                value[replacementLanguage] = entry.Value;
+                string s = value.Keys.First(k => k.ToLower().Contains(replacementLanguage.ToLower()));
+                value[s] = entry.Value;
                 result.Add(entry.Key, entry.Value);
+            }
+
+            if (swap.swap)
+            {
+                foreach (string entry in segments.Keys)
+                {
+                    string s = segments[entry].Keys.First(k => k.ToLower().Contains(swap.languageToSwapTo.ToLower()));
+                    segments[entry]["ENGLISH"] = segments[entry][s];
+                }
+                res.swappedLanguage = true;
             }
 
             ta.WriteLocaleText(segments);
