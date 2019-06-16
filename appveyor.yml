@@ -5,7 +5,7 @@ before_build:
   - dotnet --version
 build_script:
   - dotnet publish -c Release -r "win-x64" --self-contained true /p:useapphost=true
-  - python -m pip install pyinstaller
+  - python -m pip install pyinstaller --user
   - pyinstaller --onefile .\testdata\gui_script.py
 after_build:
   - dir /adh /s
