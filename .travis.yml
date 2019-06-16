@@ -11,9 +11,12 @@ mono: none
 dotnet: 2.2
 script:
   - dotnet publish -c Release -r "${TRAVIS_OS_NAME}-x64" --self-contained true /p:useapphost=true
+  - python -m pip install pyinstaller
+  - pyinstaller --onefile ./testdata/gui_script.py
 after_success:
   - cp ./jsonApp/bin/Release/netcoreapp2.2/${TRAVIS_OS_NAME}-x64/publish/jsonApp* ./app/bin/Release/netcoreapp2.2/${TRAVIS_OS_NAME}-x64/publish/
   - cp ./jsonApp2/bin/Release/netcoreapp2.2/${TRAVIS_OS_NAME}-x64/publish/jsonApp2* ./app/bin/Release/netcoreapp2.2/${TRAVIS_OS_NAME}-x64/publish/
+  - cp ./testdata/dist/gui_script* ./app/bin/Release/netcoreapp2.2/${TRAVIS_OS_NAME}-x64/publish/
   - cd app/bin/Release/netcoreapp2.2/${TRAVIS_OS_NAME}-x64
   - mv publish questsaberpatch
   - ls -lAhR questsaberpatch
