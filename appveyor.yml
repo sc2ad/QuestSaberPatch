@@ -6,7 +6,7 @@ before_build:
 build_script:
   - dotnet publish -c Release -r "win-x64" --self-contained true /p:useapphost=true
   - python -m pip install pyinstaller --user
-  - ~\AppData\Roaming\Python\Scripts\pyinstaller --onefile .\testdata\gui_script.py
+  - C:\Users\appveyor\AppData\Roaming\Python\Scripts\pyinstaller --onefile .\testdata\gui_script.py
 after_build:
   - dir /adh /s
   # I have no idea if Windows wildcards are zero or more or one or more so just drop the last letter
