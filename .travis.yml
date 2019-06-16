@@ -12,7 +12,8 @@ dotnet: 2.2
 script:
   - dotnet publish -c Release -r "${TRAVIS_OS_NAME}-x64" --self-contained true /p:useapphost=true
   - python -m pip install pyinstaller --user
-  - pyinstaller --onefile ./testdata/gui_script.py
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then /Users/travis/Library/Python/2.7/bin/pyinstaller --onefile ./testdata/gui_script.py; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then pyinstaller --onefile ./testdata/gui_script.py; fi
 after_success:
   - cp ./jsonApp/bin/Release/netcoreapp2.2/${TRAVIS_OS_NAME}-x64/publish/jsonApp* ./app/bin/Release/netcoreapp2.2/${TRAVIS_OS_NAME}-x64/publish/
   - cp ./jsonApp2/bin/Release/netcoreapp2.2/${TRAVIS_OS_NAME}-x64/publish/jsonApp2* ./app/bin/Release/netcoreapp2.2/${TRAVIS_OS_NAME}-x64/publish/
