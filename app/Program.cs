@@ -83,9 +83,14 @@ namespace app
             AddSongFolder(songs, songFolders);
             songFolders.ForEach(s =>
             {
-                string levelID = Path.GetDirectoryName(s);
+                string levelID = Path.GetFileName(s);
+                if (inv.levels.ContainsKey(levelID))
+                {
+                    Console.WriteLine("Already Contains Song: " + levelID);
+                }
                 inv.levels.Add(levelID, s);
                 levels.Add(levelID);
+                Console.WriteLine("Added song: " + levelID);
             });
             //CUSTOM IMAGE OR DEFAULT
             Console.Write("Please enter the path to the custom pack image you would like to use, or press enter to use the default: ");
