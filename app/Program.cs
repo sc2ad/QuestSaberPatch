@@ -160,6 +160,7 @@ namespace app
             }
             //REPLACE TEXT
             inv.replaceText = new Dictionary<string, string>();
+            inv.replacementLanguage = "ENGLISH";
             do
             {
                 Console.Write("Enter the key of the text you would like to replace (or leave empty to continue): ");
