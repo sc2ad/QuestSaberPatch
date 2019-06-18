@@ -4,6 +4,12 @@
     <ProjectReference Include="..\LibSaberPatch\LibSaberPatch.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="DefaultCover.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.2</TargetFramework>

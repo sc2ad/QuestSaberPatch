@@ -266,6 +266,11 @@ namespace jsonApp
             SerializedAssets textAssets = SerializedAssets.FromBytes(apk.ReadEntireEntry(apk.TextFile()), apk.version);
             var aotext = textAssets.GetAssetAt(1);
             TextAssetData ta = aotext.data as TextAssetData;
+            if (apk.version < Apk.Version.V1_1_0 && swap.swap && swap.languageToSwapTo.ToLower() != "english")
+            {
+                // Reads the BeatSaberLocale for 1.1.0 when attempting to swap but of an older version.
+                ta.script = File.ReadAllText("BeatSaberLocale_1_1_0.txt");
+            }
             var segments = ta.ReadLocaleText();
             TextAssetData.ApplyWatermark(segments);
 
