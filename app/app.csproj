@@ -1,13 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\LibSaberPatch\LibSaberPatch.csproj" />
+    <None Remove="BeatSaberLocale_1_1_0.txt" />
+    <None Remove="DefaultCover.jpg" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="DefaultCover.jpg">
+    <EmbeddedResource Include="BeatSaberLocale_1_1_0.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DefaultCover.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LibSaberPatch\LibSaberPatch.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
