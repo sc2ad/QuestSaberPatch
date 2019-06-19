@@ -67,6 +67,7 @@ namespace jsonApp
         public string error;
 
         public InvocationResult() {
+            apkVersion = Apk.Version.V1_0_0.ToString();
             didSignatureCheckPatch = false;
             didSign = false;
             didReplaceText = false;
@@ -293,6 +294,10 @@ namespace jsonApp
                 foreach (string entry in segments.Keys)
                 {
                     string s = segments[entry].Keys.First(k => k.ToLower().Contains(swap.languageToSwapTo.ToLower()));
+                    if (segments[entry]["ENGLISH"] == "ENGLISH")
+                    {
+                        continue;
+                    }
                     segments[entry]["ENGLISH"] = segments[entry][s];
                 }
                 res.swappedLanguage = true;

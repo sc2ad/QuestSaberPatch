@@ -196,7 +196,8 @@ namespace app
             Console.WriteLine("Press any key to continue...");
             Console.ReadKey();
 
-            Process.Start(new ProcessStartInfo(jsonApp2Name, "< temp.json"));
+            //Process.Start(jsonApp2Name, "< temp.json");
+            //Console.WriteLine("ALREADY COMPLETED " + jsonApp2Name + " < temp.json!");
         }
     }
 }
