@@ -15,7 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\jsonApp2\jsonApp2.csproj" />
     <ProjectReference Include="..\LibSaberPatch\LibSaberPatch.csproj" />
   </ItemGroup>
 
