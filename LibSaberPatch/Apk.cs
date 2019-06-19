@@ -95,12 +95,18 @@ namespace LibSaberPatch
 
         public string SoundEffectsFile()
         {
-            return "assets/bin/Data/level13";
+            if (version >= Version.V1_0_2)
+                return "assets/bin/Data/level13";
+            else
+                return "assets/bin/Data/level12";
         }
 
         public string SoundEffectsAudioClipsFile()
         {
-            return "assets/bin/Data/sharedassets13.assets";
+            if (version >= Version.V1_0_2)
+                return "assets/bin/Data/sharedassets13.assets";
+            else
+                return "assets/bin/Data/sharedassets12.assets";
         }
 
         public byte[] ReadEntireEntry(string entryPath) {

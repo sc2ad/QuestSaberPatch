@@ -118,7 +118,7 @@ namespace TestApp
                 var aotext = textAssets.GetAssetAt(1);
                 TextAssetData ta = aotext.data as TextAssetData;
                 string oldScript = ta.script;
-                var segments = ta.ReadLocaleText();
+                var segments = ta.ReadLocaleText(apk);
                 ta.WriteLocaleText(segments);
                 Assert.Equal(oldScript, ta.script);
             }

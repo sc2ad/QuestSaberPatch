@@ -27,14 +27,16 @@ namespace LibSaberPatch.AssetDataObjects
             w.WriteAlignedString(script);
         }
 
-        public Dictionary<string, Dictionary<string, string>> ReadLocaleText()
+        public Dictionary<string, Dictionary<string, string>> ReadLocaleText(Apk apk)
         {
             // No longer supports modifying descriptions. Maybe I'll add this back in some other time
             // Assume the first line is as follows, ALWAYS: STRING ID,DESCRIPTION,LANGUAGE1,LANGUAGE 2 / 2ALIAS, ... \r\n
             var seps = new List<char>();
             var headerList = new List<string>();
             // Read header
-            string header = script.Split(new string[] { "\r\n" }, StringSplitOptions.None)[0];
+            string header = script.Split(new string[] { "\n" }, StringSplitOptions.None)[0];
+            if (apk.version == Apk.Version.V1_1_0 || header.EndsWith("\r"))
+                header = script.Split(new string[] { "\r\n" }, StringSplitOptions.None)[0];
             for (int i = 0; i < header.Count(c => c == ','); i++)
             {
                 seps.Add(',');

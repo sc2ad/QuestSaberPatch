@@ -48,6 +48,7 @@ namespace jsonApp
     #pragma warning restore 0649
 
     class InvocationResult {
+        public string apkVersion;
         public bool didSignatureCheckPatch;
         public bool didSign;
 
@@ -98,6 +99,7 @@ namespace jsonApp
                         apk.PatchSignatureCheck();
                         res.didSignatureCheckPatch = true;
                     }
+                    res.apkVersion = apk.version.ToString();
 
                     SerializedAssets mainAssets = SerializedAssets.FromBytes(
                         apk.ReadEntireEntry(apk.MainAssetsFile()), apk.version
@@ -271,7 +273,7 @@ namespace jsonApp
                 // Reads the BeatSaberLocale for 1.1.0 when attempting to swap but of an older version.
                 ta.script = File.ReadAllText("BeatSaberLocale_1_1_0.txt");
             }
-            var segments = ta.ReadLocaleText();
+            var segments = ta.ReadLocaleText(apk);
             TextAssetData.ApplyWatermark(segments);
 
             var result = new Dictionary<string, string>();
