@@ -95,7 +95,7 @@ namespace LibSaberPatch
 
         public string SoundEffectsFile()
         {
-            if (version >= Version.V1_0_2)
+            if (version >= Version.V1_1_0)
                 return "assets/bin/Data/level13";
             else
                 return "assets/bin/Data/level12";
@@ -103,7 +103,7 @@ namespace LibSaberPatch
 
         public string SoundEffectsAudioClipsFile()
         {
-            if (version >= Version.V1_0_2)
+            if (version >= Version.V1_1_0)
                 return "assets/bin/Data/sharedassets13.assets";
             else
                 return "assets/bin/Data/sharedassets12.assets";
