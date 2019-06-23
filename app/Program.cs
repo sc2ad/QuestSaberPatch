@@ -65,14 +65,15 @@ namespace app
             Invocation inv = new Invocation();
             //APK PATH
             Console.Write("Please enter the path to your APK: ");
-            inv.apkPath = Console.ReadLine();
+            inv.apkPath = Console.ReadLine().Replace("\"", "");
+            
             if (!File.Exists(inv.apkPath))
             {
                 throw new ApplicationException("Path: " + inv.apkPath + " does not exist!");
             }
             //SONGS
             Console.Write("Please input the path to all of your songs: ");
-            string songs = Console.ReadLine();
+            string songs = Console.ReadLine().Replace("\"", "");
             if (!Directory.Exists(songs))
             {
                 throw new ApplicationException("Directory: " + songs + " does not exist!");
@@ -94,7 +95,7 @@ namespace app
             });
             //CUSTOM IMAGE OR DEFAULT
             Console.Write("Please enter the path to the custom pack image you would like to use, or press enter to use the default: ");
-            string customImage = Console.ReadLine();
+            string customImage = Console.ReadLine().Replace("\"", "");
             if (!File.Exists(customImage))
             {
                 Console.WriteLine("Could not find custom image at path: " + customImage + " using default...");
@@ -120,14 +121,16 @@ namespace app
                 SimpleColor color = _[i];
                 foreach (var field in color.GetType().GetFields())
                 {
-                    Console.Write("Enter the " + field.Name + " value for color: " + (i == 0 ? "A" : "B") + " or leave blank to use default colors: ");
+                    if (field.Name == "ScriptID")
+                        continue;
+                    Console.Write("Enter the " + field.Name + " value for color: " + (i == 0 ? "A (Right)" : "B (Left)") + " or leave blank to use default colors: ");
                     string val = Console.ReadLine();
                     try
                     {
                         field.SetValue(color, Convert.ToSingle(val));
                     } catch (FormatException)
                     {
-                        Console.WriteLine("Using default color for color: " + (i == 0 ? "A" : "B"));
+                        Console.WriteLine("Using default color for color: " + (i == 0 ? "A (Right)" : "B (Left)"));
                         _[i] = null;
                         break;
                     }
@@ -177,7 +180,7 @@ namespace app
             do
             {
                 Console.Write("Enter the path of a custom .ogg sound effect for cutting notes (or leave empty to use default cut sounds): ");
-                string sound = Console.ReadLine();
+                string sound = Console.ReadLine().Replace("\"", "");
                 if (sound.Length <= 1)
                 {
                     break;
